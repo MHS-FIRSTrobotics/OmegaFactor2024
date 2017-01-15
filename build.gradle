@@ -1,28 +1,30 @@
 buildscript {
-  repositories {
-	  mavenCentral()
-	  maven {
-		name = "GradleRIO"
-		url = "http://dev.imjac.in/maven"
-	  }
-  }
-  
-  dependencies {
-    classpath group: 'jaci.openrio.gradle', name: 'GradleRIO', version: '+', classifier: 'Toast' // Change this line if you wish to Update GradleRIO
-  }
+    repositories {
+        jcenter()
+        maven {
+            url "https://plugins.gradle.org/m2/"
+        }
+    }
+
+    dependencies {
+        classpath "gradle.plugin.jaci.openrio.gradle:GradleRIO:2017.1.0"
+    }
+}
+
+plugins {
+    id "jaci.openrio.gradle.GradleRIO" version "2017.1.0"
 }
 
 apply plugin: 'idea'
 apply plugin: 'java'
-apply plugin: 'GradleRIO' // Apply the GradleRIO plugin
 
-repositories {
-  maven {
-    name = "Toast"
-    url = "http://dev.imjac.in/maven"
-  }
+frc.team = "3465"
+frc.robotClass = "frc.team3465.omegafactor2017.RobotModule"
+
+allprojects {
+    apply plugin: "jaci.openrio.gradle.GradleRIO"
+
+    repositories {
+        jcenter()
+    }
 }
-
-gradlerio.team = "3465" // Your FRC team number (e.g. 5333 for team 'Can't C#', or 47 for Chief Delphi)
-//gradlerio.rioIP = "10.53.33.20" // Uncomment to specify the IP address of the RIO
-gradlerio.deployFile = "toast/modules/${project(":RobotCode").archivesBaseName}.jar"

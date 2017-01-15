@@ -1,25 +1,24 @@
 package frc.team3465.omegafactor2017;
 
-import jaci.openrio.toast.lib.log.Logger;
-import jaci.openrio.toast.lib.module.IterativeModule;
+import edu.wpi.first.wpilibj.IterativeRobot;
+import trikita.log.Log;
 
-public class RobotModule extends IterativeModule {
-    public static Logger logger;
-
-    @Override
-    public String getModuleName() {
-        return "OmegaFactor2017";
-    }
-
-    @Override
-    public String getModuleVersion() {
-        return "0.0.1";
-    }
+public class RobotModule extends IterativeRobot {
+    private final static String TAG = "CoreRobot";
 
     @Override
     public void robotInit() {
-        logger = new Logger("OmegaFactor2017", Logger.ATTR_DEFAULT);
+        Log.level(Log.D);
+        Log.i("Robot is starting...");
+        //logger = new Logger("OmegaFactor2017", Logger.ATTR_DEFAULT);
         //TODO: Module Init
+        Log.i("Robot is ready for action!");
+    }
+
+    @Override
+    public void disabledInit() {
+        Log.i("Disabling robot!");
+        super.disabledInit();
     }
 
     @Override
@@ -28,13 +27,13 @@ public class RobotModule extends IterativeModule {
     }
 
     @Override
-    public void teleopInit() {
-        super.teleopInit();
+    public void autonomousPeriodic() {
+        super.autonomousPeriodic();
     }
 
     @Override
-    public void autonomousPeriodic() {
-        super.autonomousPeriodic();
+    public void teleopInit() {
+        super.teleopInit();
     }
 
     @Override
