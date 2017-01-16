@@ -1,17 +1,23 @@
 package frc.team3465.omegafactor2017;
 
 import edu.wpi.first.wpilibj.IterativeRobot;
+import edu.wpi.first.wpilibj.Joystick;
+import frc.team3465.omegafactor2017.hardware.F130Gamepad;
+import frc.team3465.omegafactor2017.modes.*;
+import sun.text.normalizer.UTF16;
 import trikita.log.Log;
 
 public class RobotModule extends IterativeRobot {
     private final static String TAG = "CoreRobot";
+    private TeleOp teleOpCode;
+    private final F130Gamepad gamepad1 = new F130Gamepad(new Joystick(0));
 
     @Override
     public void robotInit() {
         Log.level(Log.D);
         Log.i("Robot is starting...");
         //logger = new Logger("OmegaFactor2017", Logger.ATTR_DEFAULT);
-        //TODO: Module Init
+        teleOpCode = new frc.team3465.omegafactor2017.modes.TeleOp(gamepad1);
         Log.i("Robot is ready for action!");
     }
 
@@ -33,11 +39,12 @@ public class RobotModule extends IterativeRobot {
 
     @Override
     public void teleopInit() {
-        super.teleopInit();
+        teleOpCode.rearm();
+        teleOpCode.start();
     }
 
     @Override
     public void teleopPeriodic() {
-        super.teleopPeriodic();
+        teleOpCode.loop();
     }
 }
