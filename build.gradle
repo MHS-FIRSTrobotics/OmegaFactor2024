@@ -7,12 +7,12 @@ buildscript {
     }
 
     dependencies {
-        classpath "gradle.plugin.jaci.openrio.gradle:GradleRIO:2017.1.0"
+        classpath "gradle.plugin.jaci.openrio.gradle:GradleRIO:2017.1.1"
     }
 }
 
 plugins {
-    id "jaci.openrio.gradle.GradleRIO" version "2017.1.0"
+    id "jaci.openrio.gradle.GradleRIO" version "2017.1.1"
 }
 
 apply plugin: 'idea'
@@ -21,10 +21,36 @@ apply plugin: 'java'
 frc.team = "3465"
 frc.robotClass = "frc.team3465.omegafactor2017.RobotModule"
 
-allprojects {
-    apply plugin: "jaci.openrio.gradle.GradleRIO"
-
-    repositories {
-        jcenter()
-    }
+repositories {
+    jcenter()
 }
+
+dependencies {
+    compile wpilib() // Compile with WPILib and it's dependencies (ntcore, opencv, cscore)
+    compile talonSrx() // Compile with the Talon SRX Library
+    compile 'co.trikita:log:1.1.5'
+    compile 'org.jetbrains:annotations:15.0'
+}
+
+def robotManifest = {
+    attributes 'Main-Class': 'edu.wpi.first.wpilibj.RobotBase'
+    attributes 'Robot-Class': frc.robotClass
+}
+
+jar {
+    from configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
+    manifest robotManifest
+}
+
+
+
+
+
+
+//allprojects {
+//    apply plugin: "jaci.openrio.gradle.GradleRIO"
+//
+//    repositories {
+//        jcenter()
+//    }
+//}

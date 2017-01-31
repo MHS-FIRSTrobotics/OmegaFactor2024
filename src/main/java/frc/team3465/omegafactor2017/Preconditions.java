@@ -8,4 +8,8 @@ public final class Preconditions {
         if (obj == null) throw new NullPointerException();
         return obj;
     }
+
+    public static double clip(double x, double min, double max) {
+        return Math.min(Math.max(x, min), max);
+    }
 }

@@ -13,4 +13,8 @@ public class HardwareMap {
     public static final VictorSP RightFront = new VictorSP(2);
     public static final VictorSP RightBack = new VictorSP(3);
 
+    public static void init() {
+        RightBack.setInverted(true);
+        RightFront.setInverted(true);
+    }
 }
