@@ -41,12 +41,12 @@ public class GripPipeline {
 	 */
 	public void process(Mat source0) {
 		// Step CV_resize0:
-		Mat cvResizeSrc = source0;
-		Size cvResizeDsize = new Size(0, 0);
-		double cvResizeFx = 0.5;
-		double cvResizeFy = 0.5;
-		int cvResizeInterpolation = Imgproc.INTER_LINEAR;
-		cvResize(cvResizeSrc, cvResizeDsize, cvResizeFx, cvResizeFy, cvResizeInterpolation, cvResizeOutput);
+		cvResizeOutput = source0;
+		//Size cvResizeDsize = new Size(0, 0);
+		//double cvResizeFx = 0.5;
+		//double cvResizeFy = 0.5;
+		//int cvResizeInterpolation = Imgproc.INTER_LINEAR;
+		//cvResize(cvResizeSrc, cvResizeDsize, cvResizeFx, cvResizeFy, cvResizeInterpolation, cvResizeOutput);
 
 		// Step HSV_Threshold0:
 		Mat hsvThresholdInput = cvResizeOutput;
