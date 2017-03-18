@@ -1,4 +1,4 @@
-package frc.team3465.omegafactor2017;
+package frc.team3465.omegafactor2017.util;
 
 /**
  * Created by FRC 3465 on 2/23/2017.

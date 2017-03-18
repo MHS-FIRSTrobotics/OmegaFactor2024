@@ -1,10 +1,15 @@
 package frc.team3465.omegafactor2017;
 
+import com.sun.javafx.geom.transform.SingularMatrixException;
 import edu.wpi.cscore.*;
 import edu.wpi.first.wpilibj.CameraServer;
 import edu.wpi.first.wpilibj.networktables.NetworkTable;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.team3465.omegafactor2017.cv.GripPipeline;
+import frc.team3465.omegafactor2017.util.Cacheable;
+import frc.team3465.omegafactor2017.util.DoubleCacheable;
+import frc.team3465.omegafactor2017.util.SmartDashboard2;
+import org.opencv.core.KeyPoint;
 import org.opencv.core.Mat;
 import org.opencv.core.Point;
 import org.opencv.core.Scalar;
@@ -21,24 +26,31 @@ public class CameraServer2 {
     private static final int IMAGE_HEIGHT = 480;
     private static final int FPS = 60;
     private static final double CAMERA_DELAY = 1 / FPS;
+    public static boolean overrideLed;
     final UsbCamera cam0;
     edu.wpi.first.wpilibj.CameraServer server;
     private CameraImageProcessor processor;
     private Thread processingThread;
     private int runAttempt = 1;
     private final static CvEnabler enabler = new CvEnabler();
+    private DoubleCacheable[] blobs = new DoubleCacheable[2];
+    private boolean notFindingTape;
+    private static double centerX;
 
     public CameraServer2() {
         server = edu.wpi.first.wpilibj.CameraServer.getInstance();
         //server.startAutomaticCapture();
         cam0 = server.startAutomaticCapture("cam0", "/dev/video0");
-        cam0.setWhiteBalanceAuto();
+        //cam0.setWhiteBalanceAuto();
         cam0.setResolution(IMAGE_WIDTH, IMAGE_HEIGHT);
         cam0.setFPS(24);
         processor = new CameraImageProcessor(server, enabler, cam0);
         processingThread = processor.start();
+        overrideLed = false;
 
-
+        for (int i = 0; i < blobs.length; i++) {
+            blobs[i] = new DoubleCacheable();
+        }
         //the camera name (ex "cam0") can be found through the roborio web interface
     }
 
@@ -51,6 +63,11 @@ public class CameraServer2 {
         processor = null;
         processor = new CameraImageProcessor(server, enabler, cam0);
         processingThread = processor.start();
+        centerX = 0;
+    }
+
+    public static double centerX() {
+        return centerX;
     }
 
     public void stop() {
@@ -65,12 +82,15 @@ public class CameraServer2 {
         private Thread runningThread;
         private boolean crashed = false;
         private final CvEnabler enabler;
+        public final Object lock = new Object();
 
         CameraImageProcessor(CameraServer server, CvEnabler enabler, UsbCamera cam0) {
             this.server = server;
             cvPipeline = new GripPipeline();
             this.enabler = enabler;
             this.camera = cam0;
+
+
         }
 
         @Override
@@ -162,6 +182,11 @@ public class CameraServer2 {
             // This cannot be 'true'. The program will never exit if it is. This
             // lets the robot stop this thread when restarting robot code or
             // deploying.
+
+            //String cv_enabled = "CV_enabled";
+            SmartDashboard2.SmartTelemetryForBoolean cvEnabled = SmartDashboard2.putBoolean("CV_enabled", false);
+            SmartDashboard2.SmartTelemetryForBoolean ledEnabled = SmartDashboard2.putBoolean("LED_E", false);
+            SmartDashboard2.SmartTelemetryForNumber ledPower = SmartDashboard2.putNumber("LED", .5);
             while (!Thread.interrupted()) {
                 // Tell the CvSink to grab a frame from the camera and put it
                 // in the source mat.  If there is an error notify the output.
@@ -171,18 +196,39 @@ public class CameraServer2 {
                     // skip the rest of the current iteration
                     continue;
                 }
-                int channels = mat.channels();
+                //int channels = mat.channels();
 
-                if (enabler.isEnabled()) {
+                if (enabler.isEnabled() || cvEnabled.getBoolean()) {
                     cvPipeline.process(mat);
 //                    mat.reshape(channels);
 //                    Log.i("Num of orig channels: " + channels);
 //                    Log.i("Num of curr channels: " + mat.channels());
-                    outputStream.putFrame(cvPipeline.hsvThresholdOutput());
+                    outputStream.putFrame(cvPipeline.cvErodeOutput());
                 } else {
                     outputStream.putFrame(mat);
                 }
 
+                KeyPoint[] points = cvPipeline.findBlobsOutput().toArray();
+                synchronized (lock) {
+                    notFindingTape = false;
+                    for (int i = 0; i < 2; i++) {
+                        if (i < points.length) {
+                            blobs[i].set(points[i].pt.x);
+                            //blobs[i] = points[i].pt.x;
+                        }
+                    }
+                    notFindingTape = blobs[0].isValid() && blobs[1].isValid();
+                    centerX = (blobs[0].safeGet(0) + blobs[1].safeGet(0)) / 2;
+                }
+
+                SmartDashboard.putNumber("CENTER_X", centerX);
+                SmartDashboard.putBoolean("FINDING_TAPE", !notFindingTape);
+                points = null;
+//                if (SmartDashboard.getBoolean("LED_E", false) || CameraServer2.overrideLed) {
+//                    HardwareMap.ledDriver.set(SmartDashboard.getNumber("LED", 0));
+//                } else {
+//                    HardwareMap.ledDriver.disable();
+//                }
                 // Put a rectangle on the image
                 //Imgproc.rectangle(mat, new Point(100, 100), new Point(400, 400),
                 //        new Scalar(255, 255, 255), 5);

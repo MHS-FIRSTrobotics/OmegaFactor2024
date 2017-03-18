@@ -1,9 +1,8 @@
 package frc.team3465.omegafactor2017.modes;
 
 import frc.team3465.omegafactor2017.AutoMode;
-import frc.team3465.omegafactor2017.ElapsedTime;
+import frc.team3465.omegafactor2017.util.ElapsedTime;
 import frc.team3465.omegafactor2017.HardwareMap;
-import frc.team3465.omegafactor2017.Mode;
 
 /**
  * Created by FRC 3465 on 2/15/2017.

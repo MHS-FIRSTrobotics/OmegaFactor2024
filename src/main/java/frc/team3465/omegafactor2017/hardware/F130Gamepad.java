@@ -3,7 +3,7 @@ package frc.team3465.omegafactor2017.hardware;
 import edu.wpi.first.wpilibj.Joystick;
 import org.jetbrains.annotations.NotNull;
 
-import static frc.team3465.omegafactor2017.Preconditions.checkNotNull;
+import static frc.team3465.omegafactor2017.util.Preconditions.checkNotNull;
 
 /**
  * Created by FIRST on 1/19/2016.

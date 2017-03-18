@@ -26,10 +26,11 @@ repositories {
 }
 
 dependencies {
-    compile wpilib() // Compile with WPILib and it's dependencies (ntcore, opencv, cscore)
-    compile talonSrx() // Compile with the Talon SRX Library
-    compile 'co.trikita:log:1.1.5'
-    compile 'org.jetbrains:annotations:15.0'
+//    compile wpilib() // Compile with WPILib and it's dependencies (ntcore, opencv, cscore)
+//    compile talonSrx() // Compile with the Talon SRX Library
+//    compile 'co.trikita:log:1.1.5'
+//    compile 'org.jetbrains:annotations:15.0'
+    compile fileTree(dir: 'libs', include: '*.jar')
 }
 
 def robotManifest = {

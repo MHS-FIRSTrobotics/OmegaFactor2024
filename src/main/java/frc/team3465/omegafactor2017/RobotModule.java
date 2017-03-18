@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj.command.Scheduler;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.team3465.omegafactor2017.hardware.F130Gamepad;
+import frc.team3465.omegafactor2017.modes.AutoCameraLineUp;
 import frc.team3465.omegafactor2017.modes.AutoDriveForward;
 import frc.team3465.omegafactor2017.modes.AutoNothing;
 import trikita.log.Log;
@@ -17,14 +18,9 @@ public class RobotModule extends IterativeRobot {
     private TeleOp teleOpCode;
     private CameraServer2 cameraServer;
     private final F130Gamepad gamepad1 = new F130Gamepad(new Joystick(0));
-    private final AutoMode[] autoMode;
+    private AutoMode[] autoMode;
     private SendableChooser<AutoMode> sendableChooser;
     private AutoMode selectedAuto;
-
-    public RobotModule() {
-        AutoMode[] temp = { new AutoNothing(), new AutoDriveForward() };
-        autoMode = temp;
-    }
 
     @Override
     public void robotInit() {
@@ -36,6 +32,8 @@ public class RobotModule extends IterativeRobot {
         teleOpCode = new frc.team3465.omegafactor2017.modes.TeleOp(gamepad1, cameraServer);
         //UsbCamera usbCamera = CameraServer.getInstance().startAutomaticCapture();
         //Log.i(CameraServer.getInstance().getServer().getKind());
+
+        autoMode = new AutoMode[]{ new AutoNothing(), new AutoDriveForward(), new AutoCameraLineUp(cameraServer)};
         sendableChooser = new SendableChooser<>();
         sendableChooser.addDefault("!!! Do Nothing !!!", autoMode[0]);
         for (int i = 1; i < autoMode.length; i++) {
@@ -47,8 +45,9 @@ public class RobotModule extends IterativeRobot {
     }
     @Override
     public void disabledInit() {
+        cameraServer.notifyToUseCv(false);
         Log.i("Disabling robot!");
-        SmartDashboard.putNumber(frc.team3465.omegafactor2017.modes.TeleOp.teleop_lat, -1);
+        //SmartDashboard.putNumber(frc.team3465.omegafactor2017.modes.TeleOp.teleop_lat, -1);
         //super.disabledInit();
     }
 
