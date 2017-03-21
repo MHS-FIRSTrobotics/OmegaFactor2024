@@ -185,8 +185,8 @@ public class CameraServer2 {
 
             //String cv_enabled = "CV_enabled";
             SmartDashboard2.SmartTelemetryForBoolean cvEnabled = SmartDashboard2.putBoolean("CV_enabled", false);
-            SmartDashboard2.SmartTelemetryForBoolean ledEnabled = SmartDashboard2.putBoolean("LED_E", false);
-            SmartDashboard2.SmartTelemetryForNumber ledPower = SmartDashboard2.putNumber("LED", .5);
+            SmartDashboard2.SmartTelemetryForBoolean ledEnabled = SmartDashboard2.putBoolean("LED_E", true);
+            SmartDashboard2.SmartTelemetryForNumber ledPower = SmartDashboard2.putNumber("LED", 1);
             while (!Thread.interrupted()) {
                 // Tell the CvSink to grab a frame from the camera and put it
                 // in the source mat.  If there is an error notify the output.
@@ -198,8 +198,10 @@ public class CameraServer2 {
                 }
                 //int channels = mat.channels();
 
+                cvPipeline.process(mat);
+
                 if (enabler.isEnabled() || cvEnabled.getBoolean()) {
-                    cvPipeline.process(mat);
+
 //                    mat.reshape(channels);
 //                    Log.i("Num of orig channels: " + channels);
 //                    Log.i("Num of curr channels: " + mat.channels());
@@ -210,20 +212,26 @@ public class CameraServer2 {
 
                 KeyPoint[] points = cvPipeline.findBlobsOutput().toArray();
                 synchronized (lock) {
-                    notFindingTape = false;
-                    for (int i = 0; i < 2; i++) {
-                        if (i < points.length) {
+                    // notFindingTape = false;
+                    for (int i = 0; i < 2 && i < points.length ; i++) {
                             blobs[i].set(points[i].pt.x);
+                            //
+                        // Log.i("point [" + i + "]: " + points[i].pt.x);
                             //blobs[i] = points[i].pt.x;
-                        }
+
                     }
-                    notFindingTape = blobs[0].isValid() && blobs[1].isValid();
-                    centerX = (blobs[0].safeGet(0) + blobs[1].safeGet(0)) / 2;
+                    notFindingTape = (!blobs[0].isValid() || !blobs[1].isValid()) && !blobs[0].isValid();
+                    centerX = (blobs[0].safeGet(0) + blobs[1].safeGet(0)) / 2d;
                 }
 
-                SmartDashboard.putNumber("CENTER_X", centerX);
+                SmartDashboard.putNumber("CENTER_X", IMAGE_WIDTH - centerX);
+                double target1 = blobs[0].safeGet(0);
+                SmartDashboard.putNumber("TGT_1", Double.isNaN(target1) ? -1 : target1);
+                double target2 = blobs[1].safeGet(1);
+                SmartDashboard.putNumber("TGT_2", Double.isNaN(target2) ? -1 : target2);
+                //Log.i("centerX: " + centerX);
                 SmartDashboard.putBoolean("FINDING_TAPE", !notFindingTape);
-                points = null;
+                //points = null;
 //                if (SmartDashboard.getBoolean("LED_E", false) || CameraServer2.overrideLed) {
 //                    HardwareMap.ledDriver.set(SmartDashboard.getNumber("LED", 0));
 //                } else {

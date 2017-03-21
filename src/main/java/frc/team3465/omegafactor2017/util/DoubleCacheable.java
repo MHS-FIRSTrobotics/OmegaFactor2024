@@ -1,5 +1,7 @@
 package frc.team3465.omegafactor2017.util;
 
+import trikita.log.Log;
+
 import java.util.Objects;
 
 /**
@@ -38,9 +40,13 @@ public class DoubleCacheable {
     public void set(double object) {
         this.object = object;
         this.setTime = System.nanoTime();
+        //Log.i("Setting obj: " + object);
     }
 
     public boolean isValid() {
-        return object != Double.NaN && setTime + expireTime < System.nanoTime();
+        boolean b = !Double.isNaN(object); // && (setTime + expireTime) < System.nanoTime();
+        //Log.i("isValid():" + b + " obj: " + object);
+
+        return b;
     }
 }

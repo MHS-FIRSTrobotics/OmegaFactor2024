@@ -294,7 +294,7 @@ public class GripPipeline implements VisionPipeline {
 
 		// Step Find_Blobs0:
 		Mat findBlobsInput = cvErodeOutput;
-		double findBlobsMinArea = 60.0;
+		double findBlobsMinArea = 15;
 		double[] findBlobsCircularity = {0.0, 1.0};
 		boolean findBlobsDarkBlobs = false;
 		findBlobs(findBlobsInput, findBlobsMinArea, findBlobsCircularity, findBlobsDarkBlobs, findBlobsOutput);
