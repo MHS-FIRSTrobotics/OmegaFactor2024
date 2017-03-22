@@ -9,10 +9,7 @@ import frc.team3465.omegafactor2017.cv.GripPipeline;
 import frc.team3465.omegafactor2017.util.Cacheable;
 import frc.team3465.omegafactor2017.util.DoubleCacheable;
 import frc.team3465.omegafactor2017.util.SmartDashboard2;
-import org.opencv.core.KeyPoint;
-import org.opencv.core.Mat;
-import org.opencv.core.Point;
-import org.opencv.core.Scalar;
+import org.opencv.core.*;
 import org.opencv.imgproc.Imgproc;
 import trikita.log.Log;
 
@@ -25,7 +22,7 @@ public class CameraServer2 {
     public static final int IMAGE_WIDTH = 640;
     private static final int IMAGE_HEIGHT = 480;
     private static final int FPS = 60;
-    private static final double CAMERA_DELAY = 1 / FPS;
+    private static final double CAMERA_DELAY = 1 / (double) FPS;
     public static boolean overrideLed;
     final UsbCamera cam0;
     edu.wpi.first.wpilibj.CameraServer server;
@@ -200,28 +197,39 @@ public class CameraServer2 {
 
                 cvPipeline.process(mat);
 
+                notFindingTape = true;
+//                for (MatOfPoint matOfPoint : cvPipeline.findContoursOutput()) {
+//                    Rect r = Imgproc.boundingRect(matOfPoint);
+//                }
+
                 if (enabler.isEnabled() || cvEnabled.getBoolean()) {
 
 //                    mat.reshape(channels);
 //                    Log.i("Num of orig channels: " + channels);
 //                    Log.i("Num of curr channels: " + mat.channels());
-                    outputStream.putFrame(cvPipeline.cvErodeOutput());
+                    outputStream.putFrame(cvPipeline.cvMedianblurOutput());
                 } else {
                     outputStream.putFrame(mat);
                 }
 
-                KeyPoint[] points = cvPipeline.findBlobsOutput().toArray();
-                synchronized (lock) {
-                    // notFindingTape = false;
-                    for (int i = 0; i < 2 && i < points.length ; i++) {
-                            blobs[i].set(points[i].pt.x);
-                            //
-                        // Log.i("point [" + i + "]: " + points[i].pt.x);
-                            //blobs[i] = points[i].pt.x;
-
-                    }
-                    notFindingTape = (!blobs[0].isValid() || !blobs[1].isValid()) && !blobs[0].isValid();
-                    centerX = (blobs[0].safeGet(0) + blobs[1].safeGet(0)) / 2d;
+//                KeyPoint[] points = cvPipeline.findBlobsOutput().toArray();
+//                synchronized (lock) {
+//                    // notFindingTape = false;
+//                    for (int i = 0; i < 2 && i < points.length ; i++) {
+//                            blobs[i].set(points[i].pt.x);
+//                            //
+//                        // Log.i("point [" + i + "]: " + points[i].pt.x);
+//                            //blobs[i] = points[i].pt.x;
+//
+//                    }
+//                    notFindingTape = (!blobs[0].isValid() || !blobs[1].isValid()) && !blobs[0].isValid();
+//                    centerX = (blobs[0].safeGet(0) + blobs[1].safeGet(0)) / 2d;
+//                }
+                notFindingTape = true;
+                for (MatOfPoint matOfPoint : cvPipeline.findContoursOutput()) {
+                    Rect r = Imgproc.boundingRect(matOfPoint);
+                    //
+                    // Log.i("r: " + (r.x + r.width / 2) + " y: " + (r.y - r.width / 2));
                 }
 
                 SmartDashboard.putNumber("CENTER_X", IMAGE_WIDTH - centerX);
@@ -243,7 +251,7 @@ public class CameraServer2 {
                 // Give the output stream a new image to display
 
                 try {
-                    Thread.sleep((long) CAMERA_DELAY * 1000);
+                    Thread.sleep(20);
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
                     return;

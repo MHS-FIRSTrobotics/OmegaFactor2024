@@ -59,6 +59,7 @@ public class RobotModule extends IterativeRobot {
     @Override
     public void autonomousInit() {
         selectedAuto = sendableChooser.getSelected();
+        Log.i("Starting " + selectedAuto.name());
         selectedAuto.rearm();
         selectedAuto.start();
     }

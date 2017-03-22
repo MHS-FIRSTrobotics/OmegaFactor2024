@@ -11,13 +11,13 @@ public class HrlvMaxSonarEz {
 
     public HrlvMaxSonarEz(AnalogInput input) {
         this.input = input;
-        input.setAverageBits(20);
-        input.setOversampleBits(20);
+        input.setAverageBits(7);
+        input.setOversampleBits(4);
         //input.initAccumulator();
     }
 
     public double getDistanceMm() {
-        double averageVoltage = input.getVoltage();
+        double averageVoltage = input.getAverageVoltage();
         //double voltageIn = 5 / 1024d;
         double mmDistance = 5 * averageVoltage / (4.959 / 1024d);
         //Log.i("Distance: " + mmDistance + "; " + averageVoltage);
